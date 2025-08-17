@@ -43,7 +43,7 @@
 </head>
 <body>
 
-    <h1>राधे कृष्णा Count: <span id="countDisplay">0</span></h1>
+    <h1>राधे-कृष्ण Count: <span id="countDisplay">0</span></h1>
     <button id="toggleBtn">▶ Start Listening</button>
 
     <h2>Save:</h2>
@@ -54,7 +54,7 @@
     let isListening = false;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
+    if (!SpeechRecognition) {
         alert("Your browser does not support Speech Recognition.");
     }
     const recognition = new SpeechRecognition();
@@ -65,47 +65,42 @@
     const toggleBtn = document.getElementById("toggleBtn");
 
     toggleBtn.onclick = () => {
-    if (!isListening) {
-        count = 0;
-        document.getElementById("countDisplay").textContent = count;
-        recognition.start();
-        isListening = true;
-        toggleBtn.textContent = "⏸ Pause Listening";
-    } else {
-        recognition.stop();
-        isListening = false;
-        toggleBtn.textContent = "▶ Start Listening";
+        if (!isListening) {
+            count = 0;
+            document.getElementById("countDisplay").textContent = count;
+            recognition.start();
+            isListening = true;
+            toggleBtn.textContent = "⏸ Pause Listening";
+        } else {
+            recognition.stop();
+            isListening = false;
+            toggleBtn.textContent = "▶ Start Listening";
 
-        if (count > 0) {
-            const li = document.createElement("li");
-            li.textContent = "राधे कृष्णा count: " + count;
-            document.getElementById("toList").appendChild(li);
+            if (count > 0) {
+                const li = document.createElement("li");
+                li.textContent = "राधे-कृष्ण count: " + count;
+                document.getElementById("toList").appendChild(li);
+            }
         }
-    }
     };
 
     recognition.onresult = function(event) {
-    const transcript = event.results[event.results.length - 1][0].transcript.trim();
-    console.log("Heard:", transcript);
+        let transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        console.log("Heard:", transcript);
 
-    // पूरा शब्द खत्म होने के बाद ही count बढ़े
-    if (transcript.endsWith("राधे")) {
-        count++;
-        document.getElementById("countDisplay").textContent = count;
-    }
-
-    if (transcript.endsWith("राधे कृष्णा")) {
-        count += 2; // example: पूरा "राधे कृष्णा" बोला तो 2 count
-        document.getElementById("countDisplay").textContent = count;
-    }
+        // सिर्फ "राधे" या "radhe" बोले तो count++
+        if (transcript.includes("राधे") || transcript.includes("radhe")) {
+            count++;
+            document.getElementById("countDisplay").textContent = count;
+        }
     };
 
     recognition.onerror = function(event) {
-    console.error("Error:", event.error);
-    isListening = false;
-    toggleBtn.textContent = "▶ Start Listening";
-};
-</script>
+        console.error("Error:", event.error);
+        isListening = false;
+        toggleBtn.textContent = "▶ Start Listening";
+    };
+    </script>
 
 </body>
 </html>

@@ -16,23 +16,23 @@
         h2 {
             margin-left: 40px;
             font-size: 70px;
+            text-align: justify;
             color: blue;
-            text-decoration: underline;
         }
         button {
-            padding: 30px 50px;
+            padding: 40px 50px;
             font-size: 50px;
             cursor: pointer;
             border: 2px solid red;
             border-radius: 50px;
         }
-        #toggleBtn{
+        #toggleBtn {
             background-color: red;
             color: white;
         }
         ul {
             margin-top: 30px;
-            font-size: 50px;
+            font-size: 80px;
             list-style-type: none;
             padding: 0;
         }
@@ -43,10 +43,10 @@
 </head>
 <body>
 
-    <h1>राधे-कृष्णा Count: <span id="countDisplay">0</span></h1>
-    <button id="toggleBtn">▶Start Listening</button>
-    
-    <h2>Save Data</h2>
+    <h1>राधे कृष्णा Count: <span id="countDisplay">0</span></h1>
+    <button id="toggleBtn">▶ Start Listening</button>
+
+    <h2>Save:</h2>
     <ul id="toList"></ul>
 
     <script>
@@ -54,7 +54,7 @@
     let isListening = false;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
+        if (!SpeechRecognition) {
         alert("Your browser does not support Speech Recognition.");
     }
     const recognition = new SpeechRecognition();
@@ -65,48 +65,47 @@
     const toggleBtn = document.getElementById("toggleBtn");
 
     toggleBtn.onclick = () => {
-        if (!isListening) {
-            // Start listening
-            count = 0;
-            document.getElementById("countDisplay").textContent = count;
-            recognition.start();
-            isListening = true;
-            toggleBtn.textContent = "⏸ Pause Listening";
-            console.log("Listening for 'राधे'...");
-        } else {
-            // Stop listening
-            recognition.stop();
-            isListening = false;
-            toggleBtn.textContent = "▶ Start Listening";
+    if (!isListening) {
+        count = 0;
+        document.getElementById("countDisplay").textContent = count;
+        recognition.start();
+        isListening = true;
+        toggleBtn.textContent = "⏸ Pause Listening";
+    } else {
+        recognition.stop();
+        isListening = false;
+        toggleBtn.textContent = "▶ Start Listening";
 
-            // सिर्फ तब Save करो जब count > 0 हो
-            if (count > 0) {
-                const li = document.createElement("li");
-                li.textContent = "राधे कृष्णा count: " + count;
-                document.getElementById("toList").appendChild(li);
-            }
+        if (count > 0) {
+            const li = document.createElement("li");
+            li.textContent = "राधे कृष्णा count: " + count;
+            document.getElementById("toList").appendChild(li);
         }
+    }
     };
 
     recognition.onresult = function(event) {
-        const transcript = event.results[event.results.length - 1][0].transcript.trim();
-        console.log("Heard:", transcript);
+    const transcript = event.results[event.results.length - 1][0].transcript.trim();
+    console.log("Heard:", transcript);
 
-        if (transcript.includes("राधे")) {
-            let matches = transcript.match(/राधे/g);
-            if (matches) {
-                count += matches.length;
-                document.getElementById("countDisplay").textContent = count;
-            }
-        }
+    // पूरा शब्द खत्म होने के बाद ही count बढ़े
+    if (transcript.endsWith("राधे")) {
+        count++;
+        document.getElementById("countDisplay").textContent = count;
+    }
+
+    if (transcript.endsWith("राधे कृष्णा")) {
+        count += 2; // example: पूरा "राधे कृष्णा" बोला तो 2 count
+        document.getElementById("countDisplay").textContent = count;
+    }
     };
 
     recognition.onerror = function(event) {
-        console.error("Error:", event.error);
-        isListening = false;
-        toggleBtn.textContent = "▶ Start Listening";
-    };
-    </script>
+    console.error("Error:", event.error);
+    isListening = false;
+    toggleBtn.textContent = "▶ Start Listening";
+};
+</script>
 
 </body>
 </html>

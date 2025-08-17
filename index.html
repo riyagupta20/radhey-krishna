@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>राधे Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 {
+            font-size: 40px;
+            color: green;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        ul {
+            margin-top: 30px;
+            font-size: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>राधे Count: <span id="countDisplay">0</span></h1>
+    <button id="startBtn">🎤 Start Listening</button>
+    <button id="stopBtn">⏹ Stop</button>
+
+    <h2>📋 To-List</h2>
+    <ul id="toList"></ul>
+
+    <script>
+    let count = 0;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Your browser does not support Speech Recognition.");
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "hi-IN";
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    document.getElementById("startBtn").onclick = () => {
+        count = 0;
+        document.getElementById("countDisplay").textContent = count;
+        recognition.start();
+        console.log("Listening for 'राधे'...");
+    };
+
+    document.getElementById("stopBtn").onclick = () => {
+        recognition.stop();
+        // count को list में add करो
+        const li = document.createElement("li");
+        li.textContent = "राधे कृष्णा count: " + count;
+        document.getElementById("toList").appendChild(li);
+    };
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[event.results.length - 1][0].transcript.trim();
+        console.log("Heard:", transcript);
+
+        // अगर 'राधे' कहीं भी सुना जाए तो count बढ़ाओ
+        if (transcript.includes("राधे")) {
+            // कितनी बार 'राधे' आया है transcript में
+            let matches = transcript.match(/राधे/g);
+            if (matches) {
+                count += matches.length;
+                document.getElementById("countDisplay").textContent = count;
+            }
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Error:", event.error);
+    };
+    </script>
+
+</body>
+</html>

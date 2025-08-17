@@ -10,18 +10,29 @@
             margin-top: 50px;
         }
         h1 {
-            font-size: 40px;
+            font-size: 100px;
             color: green;
         }
+        h2 {
+            margin-left: 40px;
+            font-size: 70px;
+            color: blue;
+            text-decoration: underline;
+        }
         button {
-            padding: 10px 20px;
-            font-size: 18px;
-            margin: 10px;
+            padding: 30px 50px;
+            font-size: 50px;
             cursor: pointer;
+            border: 2px solid red;
+            border-radius: 50px;
+        }
+        #toggleBtn{
+            background-color: red;
+            color: white;
         }
         ul {
             margin-top: 30px;
-            font-size: 20px;
+            font-size: 50px;
             list-style-type: none;
             padding: 0;
         }
@@ -32,15 +43,15 @@
 </head>
 <body>
 
-    <h1>राधे Count: <span id="countDisplay">0</span></h1>
-    <button id="startBtn">🎤 Start Listening</button>
-    <button id="stopBtn">⏹ Stop</button>
-
-    <h2>📋 To-List</h2>
+    <h1>राधे-कृष्णा Count: <span id="countDisplay">0</span></h1>
+    <button id="toggleBtn">▶Start Listening</button>
+    
+    <h2>Save Data</h2>
     <ul id="toList"></ul>
 
     <script>
     let count = 0;
+    let isListening = false;
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -51,28 +62,37 @@
     recognition.continuous = true;
     recognition.interimResults = false;
 
-    document.getElementById("startBtn").onclick = () => {
-        count = 0;
-        document.getElementById("countDisplay").textContent = count;
-        recognition.start();
-        console.log("Listening for 'राधे'...");
-    };
+    const toggleBtn = document.getElementById("toggleBtn");
 
-    document.getElementById("stopBtn").onclick = () => {
-        recognition.stop();
-        // count को list में add करो
-        const li = document.createElement("li");
-        li.textContent = "राधे कृष्णा count: " + count;
-        document.getElementById("toList").appendChild(li);
+    toggleBtn.onclick = () => {
+        if (!isListening) {
+            // Start listening
+            count = 0;
+            document.getElementById("countDisplay").textContent = count;
+            recognition.start();
+            isListening = true;
+            toggleBtn.textContent = "⏸ Pause Listening";
+            console.log("Listening for 'राधे'...");
+        } else {
+            // Stop listening
+            recognition.stop();
+            isListening = false;
+            toggleBtn.textContent = "▶ Start Listening";
+
+            // सिर्फ तब Save करो जब count > 0 हो
+            if (count > 0) {
+                const li = document.createElement("li");
+                li.textContent = "राधे कृष्णा count: " + count;
+                document.getElementById("toList").appendChild(li);
+            }
+        }
     };
 
     recognition.onresult = function(event) {
         const transcript = event.results[event.results.length - 1][0].transcript.trim();
         console.log("Heard:", transcript);
 
-        // अगर 'राधे' कहीं भी सुना जाए तो count बढ़ाओ
         if (transcript.includes("राधे")) {
-            // कितनी बार 'राधे' आया है transcript में
             let matches = transcript.match(/राधे/g);
             if (matches) {
                 count += matches.length;
@@ -83,6 +103,8 @@
 
     recognition.onerror = function(event) {
         console.error("Error:", event.error);
+        isListening = false;
+        toggleBtn.textContent = "▶ Start Listening";
     };
     </script>
 
